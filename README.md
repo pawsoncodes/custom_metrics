@@ -39,7 +39,7 @@ This repository provides examples on how to:
 Clone this repository and install the required Python packages:
 
 ```bash
-git clone https://github.com/yourusername/datadog-custom-metrics-example.git
+git clone https://github.com/pawsoncodes/custom_metrics.git
 cd datadog-custom-metrics-example
 pip install -r requirements.txt
 ```
@@ -103,42 +103,6 @@ with ApiClient(configuration) as api_client:
     response = api_instance.submit_metrics(body=body)
     print(response)
 ```
-
-### Example: Submitting a Histogram Metric via API
-
-```python
-from datetime import datetime
-from datadog_api_client.v2.api.metrics_api import MetricsApi
-from datadog_api_client.v2.model.metric_payload import MetricPayload
-from datadog_api_client.v2.model.metric_point import MetricPoint
-from datadog_api_client.v2.model.metric_series import MetricSeries
-
-# Configure the API client
-configuration = Configuration()
-with ApiClient(configuration) as api_client:
-    api_instance = MetricsApi(api_client)
-
-    # Define the histogram metric payload
-    body = MetricPayload(
-        series=[
-            MetricSeries(
-                metric="custom.myapp.response_time",
-                points=[
-                    MetricPoint(
-                        timestamp=int(datetime.now().timestamp()),
-                        value=350.0,  # Response time in ms
-                    ),
-                ],
-                tags=["env:staging", "endpoint:/api"],
-            ),
-        ],
-    )
-
-    # Submit the metric
-    response = api_instance.submit_metrics(body=body)
-    print(response)
-```
-
 ---
 
 ## Sending Custom Metrics via DogStatsD
@@ -170,17 +134,13 @@ print("Metrics sent via DogStatsD!")
 
 Custom metrics are counted towards your Datadog usage, so it’s important to keep an eye on how many you send. Here are some **best practices** to reduce cost while still getting valuable insights:
 
-1. **Metric Cardinality**:
-   - **Cardinality** refers to the number of unique combinations of metric names and tags. The higher the cardinality, the more expensive your monitoring setup becomes.
-   - **Reduce Tags**: Limit the number of tags you use on each metric. For example, avoid adding too many dimensions (like unique user IDs) unless absolutely necessary.
-
-2. **Use Distribution Metrics**:
+1. **Use Distribution Metrics**:
    - For high-cardinality metrics, consider using **distribution metrics**, which provide statistical summaries across different hosts and services without exploding the number of unique timeseries.
    
-3. **Set Custom Metric Alerts**:
+2. **Set Custom Metric Alerts**:
    - Set up alerts to notify you when you are approaching your custom metric limits. You can monitor your custom metric count using Datadog's **usage metrics** (`datadog.custom_metric.count`).
    
-4. **Aggregate at the Application Level**:
+3. **Aggregate at the Application Level**:
    - Instead of sending raw data every second, consider aggregating data on your application side (for example, compute the average, min, or max over a 10-second period) and send those values as custom metrics. This reduces the number of data points you submit.
 
 ### Tagging and Metric Naming
